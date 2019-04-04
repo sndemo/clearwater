@@ -1,0 +1,17 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: cbs
+spec:
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        service: cbs
+    spec:
+      containers:
+      - image: "richab123/cbs:0.0.2"
+        imagePullPolicy: Always
+        name: cbs
+        command: ["/bin/bash","-c","/cbs/cbs -b 10.60.3.3:9092"]
+      restartPolicy: Always

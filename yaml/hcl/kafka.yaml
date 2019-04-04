@@ -1,0 +1,41 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: kafka
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        service: kafka
+    spec:
+      containers:
+      - image: "johnnypark/kafka-zookeeper:2.1.0"
+        imagePullPolicy: Always
+        name: kafka
+        ports:
+        - containerPort: 2181
+        - containerPort: 9092
+        env:
+        - name: NUM_PARTITIONS
+          value: "10"
+        - name: ADVERTISED_HOST
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+      restartPolicy: Always
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kafka
+spec:
+  type: ClusterIP
+  ports:
+  - name: "2181"
+    port: 2181
+  - name: "9092"
+    port: 9092
+  selector:
+    service: kafka

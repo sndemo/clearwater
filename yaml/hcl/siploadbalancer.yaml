@@ -1,0 +1,45 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: siploadbalancer
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        service: siploadbalancer
+    spec:
+      hostname: siploadbalancer
+      containers:
+      - image: "richab123/siploadbalancer"
+        imagePullPolicy: Always
+        name: siploadbalancer
+        ports:
+        - containerPort: 2000
+        - containerPort: 2001
+        - containerPort: 2080
+        - containerPort: 5060
+        - containerPort: 5065
+        command: ["/bin/bash","-c","cd sip-balancer-jar-10.1.0-53 && java -DlogConfigFile=./lb-log4j.xml -jar sip-balancer-jar-10.1.0-53-jar-with-dependencies.jar  -mobicents-balancer-config=lb-configuration.xml"]
+      restartPolicy: Always
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: siploadbalancer
+spec:
+  type: ClusterIP
+  ports:
+  - name: "2000"
+    port: 2000
+  - name: "2001"
+    port: 2001
+  - name: "2080"
+    port: 2080
+  - name: "5060"
+    port: 5060
+  - name: "5065"
+    port: 5065
+  selector:
+    service: siploadbalancer
